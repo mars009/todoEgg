@@ -1,0 +1,3 @@
+rootProject.name = 'todoEgg'
+
+include ':app'
