@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Platform, ListView, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, Platform, ListView, Keyboard, AsyncStorage } from 'react-native';
 import Header from './header';
 import Footer from './footer';
 import Row from './row';
@@ -51,6 +51,22 @@ class App extends Component {
     this.handleClearComplete = this.handleClearComplete.bind(this);
   }
 
+  componentWillMount() {
+    /**
+     * AsyncStorage.getItem("key") takes in a key of items to gather and returns a Promise,
+     * which upon "then" returns a "json" string
+     */
+    AsyncStorage.getItem("items").then((json) => {
+        // try/catch block needed in case json is unparsable
+        try {
+          const items = JSON.parse(json);
+          this.setSource(items, items);
+        } catch(e) { 
+
+        }
+    })
+  }
+
   setSource(items, itemsDataSource, otherState = {}) {
     this.setState({
       items,
@@ -59,6 +75,10 @@ class App extends Component {
       // Any other state that anybody gives us
       ...otherState
     });
+
+    // Because all our calls to set items go through this method, we can call AsyncStorage
+    // to set the "items" within it
+    AsyncStorage.setItem("items", JSON.stringify(items));
   }
 
   handleClearComplete() {
