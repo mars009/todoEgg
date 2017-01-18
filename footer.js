@@ -9,6 +9,7 @@ class Footer extends Component {
 
     return (
       <View style={styles.container}>
+        <Text>{this.props.count} count</Text>
         <View style={styles.filters}>
           {/*There is a bug in the video. "onPress" needs to be a function that makes the call to 'this.props.onFilter('...')'
             ; otherwise, if you just do "onPress={this.props.onFilter('ALL')}" the function will be called immediately causing a
