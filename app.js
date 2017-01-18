@@ -4,6 +4,22 @@ import Header from './header';
 import Footer from './footer';
 import Row from './row';
 
+const filterItems = (filter, items) => {
+  return items.filter((item) => {
+    if (filter === 'ALL') {
+      return true;
+    }
+
+    if (filter === 'COMPLETED') {
+      return item.complete;
+    }
+
+    if (filter === 'ACTIVE') {
+      return !item.complete;
+    }
+  })
+}
+
 class App extends Component {
 
   constructor(props) {
@@ -21,6 +37,7 @@ class App extends Component {
       value: "",
       items: [],
       allComplete: false,
+      filter: 'ALL',
       // We add the dataSource to our state by using the "DataSource.cloneWithRows()" function
       dataSource: dataSource.cloneWithRows([])
     }
@@ -30,6 +47,7 @@ class App extends Component {
     this.setSource = this.setSource.bind(this);
     this.handleToggleComplete = this.handleToggleComplete.bind(this);
     this.handleRemoveItem = this.handleRemoveItem.bind(this);
+    this.handleFilter = this.handleFilter.bind(this);
   }
 
   setSource(items, itemsDataSource, otherState = {}) {
@@ -40,6 +58,12 @@ class App extends Component {
       // Any other state that anybody gives us
       ...otherState
     });
+  }
+
+  handleFilter(filter) {
+    console.log(`handle filter ${filter}`)
+    // As the 2nd param we filter the items since those are the items we want to display in our ListView
+    this.setSource(this.state.items, filterItems(filter, this.state.items), {filter});
   }
 
   handleToggleComplete(key, complete) {
@@ -55,7 +79,7 @@ class App extends Component {
       }
     });
 
-    this.setSource(newItems, newItems);
+    this.setSource(newItems, filterItems(this.state.filter, newItems));
   }
 
   handleRemoveItem(key) {
@@ -63,7 +87,7 @@ class App extends Component {
       return item.key !== key;
     });
 
-    this.setSource(newItems, newItems)
+    this.setSource(newItems, filterItems(this.state.filter, newItems));
   }
 
   handleToggleAllComplete() {    
@@ -78,7 +102,7 @@ class App extends Component {
       complete
     }));    
 
-    this.setSource(newItems, newItems, {allComplete: complete});
+    this.setSource(newItems, filterItems(this.state.filter, newItems), {allComplete: complete});
   }
 
   handleAddItem() {    
@@ -96,7 +120,7 @@ class App extends Component {
     ];
 
     // Set the state adding the new todo and removing the value in the input
-    this.setSource(newItems, newItems, { value: ''});
+    this.setSource(newItems, filterItems(this.state.filter, newItems), { value: ''});
   }
 
   render() {
@@ -128,7 +152,7 @@ class App extends Component {
             }}
           />
         </View>
-        <Footer/>
+        <Footer filter={this.state.filter} onFilter={this.handleFilter}/>
       </View>
     );
   }
