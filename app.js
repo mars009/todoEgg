@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Platform, ListView, Keyboard, AsyncStorage } from 'react-native';
+import { View, Text, StyleSheet, Platform, ListView, Keyboard, AsyncStorage, ActivityIndicator } from 'react-native';
 import Header from './header';
 import Footer from './footer';
 import Row from './row';
@@ -37,6 +37,7 @@ class App extends Component {
       value: "",
       items: [],
       allComplete: false,
+      loading: true,
       filter: 'ALL',
       // We add the dataSource to our state by using the "DataSource.cloneWithRows()" function
       dataSource: dataSource.cloneWithRows([])
@@ -60,9 +61,9 @@ class App extends Component {
         // try/catch block needed in case json is unparsable
         try {
           const items = JSON.parse(json);
-          this.setSource(items, items);
+          this.setSource(items, items, { loading: false});
         } catch(e) { 
-
+          this.setState({ loading: false })
         }
     })
   }
@@ -185,6 +186,14 @@ class App extends Component {
           onFilter={this.handleFilter} 
           count={filterItems("ACTIVE", this.state.items).length}
           onClearComplete={this.handleClearComplete}/>
+         {/* Only show the ActivityIndicator if "this.state.loading" is true*/}
+         {this.state.loading && 
+          <View style={styles.loading}>
+            <ActivityIndicator 
+              animating
+              size="large"/>
+          </View>
+         }
       </View>
     );
   }
@@ -203,6 +212,16 @@ const styles = StyleSheet.create({
   },
   list: {
     backgroundColor: '#FFF',
+  },
+  loading: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, .2)"
   },
   separator: {
     borderWidth: 1,
